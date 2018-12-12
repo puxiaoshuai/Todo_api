@@ -1,0 +1,62 @@
+from exts import db
+from datetime import datetime
+from werkzeug.security import generate_password_hash, check_password_hash
+from itsdangerous import TimedJSONWebSignatureSerializer as Srializer
+from config import BaseConfig
+
+
+class User(db.Model):
+    __tablename__ = 'user'
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    username = db.Column(db.String(36), index=True)
+    __password = db.Column(db.String(128))
+
+    def __init__(self, password, username):
+        self.password = password
+        self.username = username
+
+    # 返回加密的密码
+    @property
+    def password(self):
+        return self.__password
+
+    # 加密密码
+    @password.setter
+    def password(self, pwd):
+        self.__password = generate_password_hash(pwd)
+
+    # 检查密码
+    def check_pwd(self, pwd):
+        reslut = check_password_hash(self.password, pwd)
+        return reslut
+
+    def get_auth_token(self, expiration=600):
+        s = Srializer(BaseConfig.SECRET_KEY, expires_in=expiration)
+        return s.dumps({'id': self.id})
+
+    @staticmethod
+    def verfy_auth_token(token):
+        s = Srializer(BaseConfig.SECRET_KEY)
+        try:
+            data = s.loads(token)
+        except:
+            return None
+        user = User.query.get(data['id'])
+        return user
+
+    def to_json(self):
+        return {
+            'username': self.username,
+            'token':self.get_auth_token().decode('ascii')
+
+        }
+
+
+class TaskModel(db.Model):
+    __tablename__ = 'task'
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    title = db.Column(db.String(128), index=True, nullable=False)
+    content = db.Column(db.Text, nullable=True)
+    create_time = db.Column(db.DateTime, default=datetime.now)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    user = db.relationship("User", backref='task')
