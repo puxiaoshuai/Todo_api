@@ -7,7 +7,7 @@ USENAME = 'root'
 PASSWORD = 'puhao'
 DB_URI = "mysql://{}:{}@{}:{}/{}?charset=utf8".format(USENAME, PASSWORD, HOSTNAME, PORT, DATABASE)
 PAGE_SIZE = 9
-
+USER_ID="USER_ID"
 
 class BaseConfig(object):
     # SECRET_KEY=os.urandom(24)

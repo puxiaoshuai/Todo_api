@@ -35,18 +35,26 @@ class User(db.Model):
         return s.dumps({'id': self.id})
 
     @staticmethod
-    def verfy_auth_token(token):
+    def verify_auth_token(token):
         s = Srializer(BaseConfig.SECRET_KEY)
         try:
-            data = s.loads(token)
+            print("user中token"+token)
+            data = s.loads(token.encode("ascii"))
+            print("datais====")
+            print(data)
+            user = User.query.get(data['id'])
+            return user
         except:
+            print("user中token校验失败")
             return None
-        user = User.query.get(data['id'])
-        return user
+
+
+
 
     def to_json(self):
         return {
             'username': self.username,
+            #以ascii编码对字符串str进行解码，获得字符串类型对象
             'token':self.get_auth_token().decode('ascii')
 
         }

@@ -4,41 +4,34 @@ from flask_restful import Resource, abort, reqparse, Api
 from apps.app_v1.models import User, TaskModel
 from apps.app_v1.HttpBase import generate_response, ResponseCode
 from exts import db
-from flask_httpauth import HTTPBasicAuth
-
-auth = HTTPBasicAuth()
+from apps.app_v1.utils import check_token
+from config import USER_ID
+from apps.app_v1.decorators import login_required
 
 app_v1 = Blueprint('todo', __name__, url_prefix='/todo/api')
 api = Api(app=app_v1)
 
 
-@app_v1.route("/tasks/")
-def index():
-    return jsonify({"python": "111"})
+# @app_v1.route("/tasks/",methods=["POST"])
+# @login_required
+
+class TaskListView(Resource):
+    decorators = [login_required]
+
+    # 如果前端要访问，需要传token，过来做比较,True做其他操作
+    def post(self):
+        if check_token():
+            return "获取成功"
+        else:
+            return generate_response(code=ResponseCode.CODE_NOT_LOGIN, message="登录token失效")
 
 
-@app_v1.route("/token/", methods=["GET"])
-@auth.login_required
-def get_auth_token():
-    # 登录的时候，存储g.user,此处就能引用
-    token = g.user.get_auth_token()
-    return generate_response(data=token)
+class LogoutView(Resource):
+    decorators = [login_required]
 
-
-@auth.verify_password
-def verify_password(username, password):
-    user = User.query.filter_by(username=username).first()
-    print("=====")
-    print(user)
-    if not user or not user.check_pwd(password):
-        return False
-    g.user = user
-    return True
-
-
-@auth.error_handler
-def unauthorized():
-    return make_response(jsonify(generate_response(code=ResponseCode.CODE_NOT_LOGIN)), 401)
+    def post(self):
+        del session[USER_ID]
+        return generate_response(message="注销成功")
 
 
 class LoginView(Resource):
@@ -51,7 +44,7 @@ class LoginView(Resource):
         user = User.query.filter_by(username=username).first()
         if user:
             if user.check_pwd(pwd):
-                g.user = user
+                session[USER_ID] = user.id
                 return generate_response(message="登录成功", data=user.to_json())
         else:
             return generate_response(message="该账号没注册")
@@ -78,5 +71,13 @@ class ResisterView(Resource):
                 db.session.rollback()
 
 
+# class Fail(Resource):
+#
+#     def get(self):
+#         del session[USER_ID]
+#         return generate_response(message="注销成功")
+
 api.add_resource(LoginView, '/login/', endpoint='login')
-api.add_resource(ResisterView, '/resister/', endpoint='register')
+api.add_resource(LogoutView, '/logout/', endpoint='logout')
+api.add_resource(ResisterView, '/register/', endpoint='register')
+api.add_resource(TaskListView, '/tasks/', endpoint='tasks')
