@@ -1,6 +1,7 @@
 class ResponseCode:
     CODE_SUCCESS = 200  # 凡是成功都用
     CODE_HAS_RESOURCE = 202  # 资源存在了
+    CODE_MESSAGE_ERROR = 203  # 提交的信息有误
     CODE_NO_PARAM = 400  # 参数错误
     CODE_NOT_LOGIN = 401  # 未认证
     CODE_NOTFOUND = 404  # 资源不存在
@@ -12,7 +13,8 @@ class ResponseCode:
         CODE_NO_PARAM: "参数错误",
         CODE_NOT_LOGIN: "没有登录",
         CODE_NOTFOUND: "找不到资源",
-        CODE_SERVER_ERROE: "对不起，服务器错误"
+        CODE_SERVER_ERROE: "对不起，服务器错误",
+        CODE_MESSAGE_ERROR:"信息有误"
 
     }
 

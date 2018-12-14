@@ -15,7 +15,8 @@ class User(db.Model):
     def __init__(self, password, username):
         self.password = password
         self.username = username
-
+    def __repr__(self):
+        return self.username
     # 返回加密的密码
     @property
     def password(self):
@@ -32,16 +33,17 @@ class User(db.Model):
         return reslut
 
     def get_auth_token(self, expiration=600):
+        # SECRET_KEY为秘钥
         s = Srializer(BaseConfig.SECRET_KEY, expires_in=expiration)
-        print(type(s))
-        print(s)
+        #调用dumps把id值进行加密
         return s.dumps({'id': self.id})
 
     @staticmethod
     def verify_auth_token(token):
+
         s = Srializer(BaseConfig.SECRET_KEY)
         try:
-
+            #进行loads解析
             data = s.loads(token)
             user = User.query.get(data['id'])
             return user
@@ -52,8 +54,8 @@ class User(db.Model):
     def to_json(self):
         return {
             'username': self.username,
-            # 以ascii编码对字符串str进行解码，获得字符串类型对象
-            'token': self.get_auth_token().decode('ascii')
+            # 以utf8编码对字符串str进行解码，获得字符串类型对象
+            'token': self.get_auth_token().decode('utf-8')
 
         }
 

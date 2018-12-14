@@ -14,3 +14,5 @@ config中数据库自行配置，数据库名，密码，等
 """
 
 ###### 不同电脑办公，数据库迁移问题,直接 db upgrade
+###### 开发问题记录
+1. postman能获取tasklist,移动端传了token,却说是不能token失效

@@ -4,13 +4,17 @@ from flask_restful import Resource, abort, reqparse, Api
 from apps.app_v1.models import User, TaskModel
 from apps.app_v1.HttpBase import generate_response, ResponseCode
 from exts import db
-from apps.app_v1.utils import check_token
-from config import USER_ID
+
+import config
 from apps.app_v1.decorators import login_required, check_app_token
 
 app_v1 = Blueprint('todo', __name__, url_prefix='/todo/api')
 api = Api(app=app_v1)
 
+
+@app_v1.route("/")
+def index():
+    return "测试机"
 
 class TaskListView(Resource):
     decorators = [login_required, check_app_token]
@@ -83,10 +87,10 @@ class TaskAddView(Resource):
 
 
 class LogoutView(Resource):
-    decorators = [login_required]
 
     def post(self):
-        del session[USER_ID]
+        print("执行1")
+        session.pop(config.USER_ID, None)
         return generate_response(message="注销成功")
 
 
@@ -100,10 +104,15 @@ class LoginView(Resource):
         user = User.query.filter_by(username=username).first()
         if user:
             if user.check_pwd(pwd):
-                session[USER_ID] = user.id
+
+                session[config.USER_ID] = user.id
+                print("session 存储成功")
+                print(session.get(config.USER_ID))
                 return generate_response(message="登录成功", data=user.to_json())
+            else:
+                return generate_response(message="账号或者密码错误",code=ResponseCode.CODE_MESSAGE_ERROR)
         else:
-            return generate_response(message="该账号没注册")
+            return generate_response(message="该账号没注册",code=ResponseCode.CODE_NOTFOUND)
 
 
 class ResisterView(Resource):
