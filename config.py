@@ -7,12 +7,12 @@ DATABASE = 'todo'
 USENAME = 'root'
 PASSWORD = 'puhao'
 DB_URI = "mysql://{}:{}@{}:{}/{}?charset=utf8".format(USENAME, PASSWORD, HOSTNAME, PORT, DATABASE)
-PAGE_SIZE = 9
 USER_ID="app_user_id"
+PAGE_SIZE="8"
 
 class BaseConfig(object):
-    SECRET_KEY=os.urandom(24)
-    #SECRET_KEY = 'puxiaoshuai20181212'
+    #SECRET_KEY=os.urandom(24)
+    SECRET_KEY = 'puxiaoshuai20181212'
 
 
 class DevelopmentConfig(BaseConfig):

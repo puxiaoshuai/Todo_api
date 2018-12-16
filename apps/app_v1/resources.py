@@ -16,15 +16,29 @@ api = Api(app=app_v1)
 def index():
     return "测试机"
 
+
 class TaskListView(Resource):
     decorators = [login_required, check_app_token]
 
     # 如果前端要访问，需要传token，过来做比较,True做其他操作
     def post(self):
-        tasks = TaskModel.query.all()
-        print(tasks)
+        parse = reqparse.RequestParser()
+        parse.add_argument("page_size", type=str, default=config.PAGE_SIZE)
+        parse.add_argument("page", required=True, type=str)
+        page_size = parse.parse_args().get("page_size")
+        page_index = parse.parse_args().get("page")
+        total_num = len(TaskModel.query.order_by(TaskModel.create_time.desc()).all())
+
+        tasks = TaskModel.query.order_by(TaskModel.create_time.desc()).limit(page_size).offset(
+            (int(page_index) - 1) * int(page_size))
         task_list = [task.to_json() for task in tasks]
-        return generate_response(data=task_list)
+        to_data = {
+            "page": page_index,
+            'page_size': page_size
+            , 'total_num': total_num,
+            'list': task_list
+        }
+        return generate_response(data=to_data)
 
 
 # 想想前台的删除，只是把状态改成了127，不存在真正的删除，前台收到200，自动把当前一条移动走就相当于删除成功啦
@@ -86,6 +100,7 @@ class TaskAddView(Resource):
             return generate_response(code=ResponseCode.CODE_SERVER_ERROE)
 
 
+# 在客户端其实不用请求退出登录，这样子，电脑，移动端都能多端登录，因为都有存在的seesion
 class LogoutView(Resource):
 
     def post(self):
@@ -110,9 +125,9 @@ class LoginView(Resource):
                 print(session.get(config.USER_ID))
                 return generate_response(message="登录成功", data=user.to_json())
             else:
-                return generate_response(message="账号或者密码错误",code=ResponseCode.CODE_MESSAGE_ERROR)
+                return generate_response(message="账号或者密码错误", code=ResponseCode.CODE_MESSAGE_ERROR)
         else:
-            return generate_response(message="该账号没注册",code=ResponseCode.CODE_NOTFOUND)
+            return generate_response(message="该账号没注册", code=ResponseCode.CODE_NOTFOUND)
 
 
 class ResisterView(Resource):
