@@ -16,3 +16,13 @@ config中数据库自行配置，数据库名，密码，等
 ###### 不同电脑办公，数据库迁移问题,直接 db upgrade
 ###### 开发问题记录
 1. postman能获取tasklist,移动端传了token,却说是不能token失效
+经过排查是在浏览器会直接加载cookie，而客户端需要在网络请求中设置cookie，就好了。
+###### api功能点,以及传递参数
+    "/logout/"; 
+    "/login";(username,password)
+    "/register/";(username,password)
+    "/tasks/";(token,id)
+    "/tasks/add/";(token)
+    "/tasks/del/";(token,id)
+    "/tasks/edit/";(token,id)
+    
