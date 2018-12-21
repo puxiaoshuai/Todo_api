@@ -19,8 +19,7 @@ config中数据库自行配置，数据库名，密码，等
 ###### siper中爬取古诗数据
 数据库设计的话，tags与古诗是多对多关系
 经过排查是在浏览器会直接加载cookie，而客户端需要在网络请求中设置cookie，就好了。
-###### api功能点,以及传递参数
-    "/logout/"; 
+###### api功能点,以及传递参数   "/logout/"; 
     "/login";(username,password)
     "/register/";(username,password)
     "/tasks/";(token,id)

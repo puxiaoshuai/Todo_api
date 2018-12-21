@@ -4,7 +4,7 @@ from flask_restful import Resource, abort, reqparse, Api
 from apps.app_v1.models import User, TaskModel
 from apps.app_v1.HttpBase import generate_response, ResponseCode
 from exts import db
-
+import os
 import config
 from apps.app_v1.decorators import login_required, check_app_token
 
@@ -12,9 +12,6 @@ app_v1 = Blueprint('todo', __name__, url_prefix='/todo/api')
 api = Api(app=app_v1)
 
 
-@app_v1.route("/")
-def index():
-    return "测试机"
 
 
 class TaskListView(Resource):
@@ -24,7 +21,7 @@ class TaskListView(Resource):
     def post(self):
         parse = reqparse.RequestParser()
         parse.add_argument("page_size", type=str, default=config.PAGE_SIZE)
-        parse.add_argument("page", required=True, type=str,help="page没有传递")
+        parse.add_argument("page", required=True, type=str, help="page没有传递")
         page_size = parse.parse_args().get("page_size")
         page_index = parse.parse_args().get("page")
         total_num = len(TaskModel.query.order_by(TaskModel.create_time.desc()).all())
