@@ -24,7 +24,7 @@ class TaskListView(Resource):
     def post(self):
         parse = reqparse.RequestParser()
         parse.add_argument("page_size", type=str, default=config.PAGE_SIZE)
-        parse.add_argument("page", required=True, type=str)
+        parse.add_argument("page", required=True, type=str,help="page没有传递")
         page_size = parse.parse_args().get("page_size")
         page_index = parse.parse_args().get("page")
         total_num = len(TaskModel.query.order_by(TaskModel.create_time.desc()).all())
@@ -119,7 +119,6 @@ class LoginView(Resource):
         user = User.query.filter_by(username=username).first()
         if user:
             if user.check_pwd(pwd):
-
                 session[config.USER_ID] = user.id
                 print("session 存储成功")
                 print(session.get(config.USER_ID))

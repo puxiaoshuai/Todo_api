@@ -25,16 +25,15 @@ def check_app_token(func):
     @wraps(func)
     def inner(*args, **kwargs):
         parse = reqparse.RequestParser()
-        parse.add_argument("token")
+        parse.add_argument("token",help="token没传")
         token = parse.parse_args().get("token", "0")
         try:
             user = g.user
             if user.verify_auth_token(token):
                 return func(*args, *kwargs)
             else:
-                return generate_response(message="登录token失效啦1,请重新登录", code=ResponseCode.CODE_NOT_LOGIN)
+                return generate_response(message="登录token失效啦,请重新登录", code=ResponseCode.CODE_NOT_LOGIN)
         except Exception as err:
             print(err.args)
             return generate_response(message="登录token异常,请重新登录", code=ResponseCode.CODE_NOT_LOGIN)
-
     return inner
