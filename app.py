@@ -2,7 +2,6 @@ from flask import Flask
 import config
 from exts import db
 from flask_migrate import Migrate
-from flask_login import LoginManager
 from apps.admin import admin
 from apps.front import front
 from  apps.app_v1 import app_v1

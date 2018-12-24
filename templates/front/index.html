@@ -5,7 +5,7 @@
     <title>Title</title>
 </head>
 <body>
-{%  set filename1=filename %}
+{%  set file_name=filename %}
 <form role="form" action="/update/" method="post" enctype="multipart/form-data">
     <div class="form-group">
 
@@ -16,6 +16,6 @@
 
 </form>
 <h3>姓名：{{ username }}</h3>
-<img  alt="图片丢失了" onerror="this.src='http://image.biaobaiju.com/uploads/20180928/16/1538124027-aMtYOyIRzC.jpeg'" style="width: 80px; height: 80px;" src="{{ url_for('static',filename=filename1)}}">
+<img  alt="图片丢失了" onerror="this.src='http://image.biaobaiju.com/uploads/20180928/16/1538124027-aMtYOyIRzC.jpeg'" style="width: 80px; height: 80px;" src="{{ url_for('static',filename=file_name)}}">
 </body>
 </html>

@@ -23,7 +23,7 @@ def up_pic():
 
         return redirect(url_for('.up_pic'))
     else:
-        filename=session.get("filename")
+        filename=session.get("filename",'')
         username=session.get("username")
         data={
             'filename':filename,

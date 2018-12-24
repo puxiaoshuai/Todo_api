@@ -4,6 +4,7 @@ from flask_restful import Resource, abort, reqparse, Api
 from apps.app_v1.models import User, TaskModel
 from apps.app_v1.HttpBase import generate_response, ResponseCode
 from exts import db
+import qiniu
 import os
 import config
 from apps.app_v1.decorators import login_required, check_app_token
@@ -12,6 +13,15 @@ app_v1 = Blueprint('todo', __name__, url_prefix='/todo/api')
 api = Api(app=app_v1)
 
 
+@app_v1.route("/uptoken/", methods=["POST"])
+def up_token():
+    access_key = "BkaslCENSa-EbKEjHbCExMprdB8FwTELgI_zOVZ5"
+    secret_key = 'GQbM6Y9Orc09bW6CyRn8qaLVmqoTCYo84iex1zUk'
+    q = qiniu.Auth(access_key, secret_key)
+    bucket = 'todo'
+    # expires设置缓存时间15天,可自己设置
+    token = q.upload_token(bucket=bucket, expires=3600 * 24 * 15)
+    return jsonify(generate_response(data=token))
 
 
 class TaskListView(Resource):
@@ -64,12 +74,15 @@ class TaskEditView(Resource):
         parse.add_argument("title", required=True)
         parse.add_argument("content", required=True)
         id = parse.parse_args().get('id', "0")
+
         title = parse.parse_args().get('title')
+        print(title)
         content = parse.parse_args().get('content')
         task = TaskModel.query.filter_by(id=id).first()
         if task:
             task.title = title
             task.content = content
+
             db.session.commit()
             return generate_response(message="编辑信息成功")
         else:
@@ -83,16 +96,21 @@ class TaskAddView(Resource):
         parse = reqparse.RequestParser()
         parse.add_argument("title", required=True)
         parse.add_argument("content")
+        parse.add_argument("files",action='append')
         title = parse.parse_args().get("title")
         content = parse.parse_args().get("content")
+        files = parse.parse_args().get("files", [])
+        print(files)
         user = g.user
         try:
-            task = TaskModel(title=title, content=content)
+            task = TaskModel(title=title, content=content, images="" if files is [] else ",".join(files))
             task.user_id = user.id
+
             db.session.add(task)
             db.session.commit()
             return generate_response()
-        except:
+        except Exception as e:
+            print(e.args)
             db.session.rollback()
             return generate_response(code=ResponseCode.CODE_SERVER_ERROE)
 
@@ -111,8 +129,10 @@ class LoginView(Resource):
         parse = reqparse.RequestParser()
         parse.add_argument("username", type=str, required=True)
         parse.add_argument("password", type=str, required=True)
+
         username = parse.parse_args().get("username")
         pwd = parse.parse_args().get("password")
+
         user = User.query.filter_by(username=username).first()
         if user:
             if user.check_pwd(pwd):

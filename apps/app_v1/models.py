@@ -65,10 +65,14 @@ class TaskModel(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     title = db.Column(db.String(128), index=True, nullable=False)
     content = db.Column(db.Text, nullable=True)
+    images=db.Column(db.String(256))
     create_time = db.Column(db.DateTime, default=datetime.now)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     user = db.relationship("User", backref='task')
 
+    @property
+    def image_urls(self):
+        return self.images.split(",")
     def __repr__(self):
         return "title is {}".format(self.title)
 

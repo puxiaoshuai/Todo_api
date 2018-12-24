@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <dataSource name="todo@localhost">
-  <database-model serializer="dbm" rdbms="MYSQL" format-version="4.7">
+  <database-model serializer="dbm" rdbms="MYSQL" format-version="4.11">
     <root id="1">
       <DefaultCasing>lower/lower</DefaultCasing>
     </root>
@@ -841,7 +841,7 @@
     </table>
     <column id="214" parent="211" name="version_num">
       <Position>1</Position>
-      <DataType>varchar(32)|0</DataType>
+      <DataType>varchar(32)|0s</DataType>
       <NotNull>1</NotNull>
       <ColumnKind>normal</ColumnKind>
     </column>
@@ -852,30 +852,30 @@
     </key>
     <column id="216" parent="212" name="id">
       <Position>1</Position>
-      <DataType>int(11)|0</DataType>
+      <DataType>int(11)|0s</DataType>
       <NotNull>1</NotNull>
       <SequenceIdentity>1</SequenceIdentity>
       <ColumnKind>normal</ColumnKind>
     </column>
     <column id="217" parent="212" name="title">
       <Position>2</Position>
-      <DataType>varchar(128)|0</DataType>
+      <DataType>varchar(128)|0s</DataType>
       <NotNull>1</NotNull>
       <ColumnKind>normal</ColumnKind>
     </column>
     <column id="218" parent="212" name="content">
       <Position>3</Position>
-      <DataType>text|0</DataType>
+      <DataType>text|0s</DataType>
       <ColumnKind>normal</ColumnKind>
     </column>
     <column id="219" parent="212" name="create_time">
       <Position>4</Position>
-      <DataType>datetime|0</DataType>
+      <DataType>datetime|0s</DataType>
       <ColumnKind>normal</ColumnKind>
     </column>
     <column id="220" parent="212" name="user_id">
       <Position>5</Position>
-      <DataType>int(11)|0</DataType>
+      <DataType>int(11)|0s</DataType>
       <ColumnKind>normal</ColumnKind>
     </column>
     <index id="221" parent="212" name="ix_task_title">
@@ -897,19 +897,19 @@
     </foreign-key>
     <column id="225" parent="213" name="id">
       <Position>1</Position>
-      <DataType>int(11)|0</DataType>
+      <DataType>int(11)|0s</DataType>
       <NotNull>1</NotNull>
       <SequenceIdentity>1</SequenceIdentity>
       <ColumnKind>normal</ColumnKind>
     </column>
     <column id="226" parent="213" name="username">
       <Position>2</Position>
-      <DataType>varchar(36)|0</DataType>
+      <DataType>varchar(36)|0s</DataType>
       <ColumnKind>normal</ColumnKind>
     </column>
     <column id="227" parent="213" name="_User__password">
       <Position>3</Position>
-      <DataType>varchar(128)|0</DataType>
+      <DataType>varchar(128)|0s</DataType>
       <ColumnKind>normal</ColumnKind>
     </column>
     <index id="228" parent="213" name="ix_user_username">
