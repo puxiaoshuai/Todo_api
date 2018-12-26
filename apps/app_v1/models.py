@@ -72,7 +72,7 @@ class TaskModel(db.Model):
 
     @property
     def image_urls(self):
-        return self.images.split(",")
+        return [] if self.images is None else self.images.split(",")
     def __repr__(self):
         return "title is {}".format(self.title)
 
@@ -81,5 +81,6 @@ class TaskModel(db.Model):
             'id': self.id,
             'title': self.title,
             'content': self.content,
+            'images':self.image_urls,
             'create_time':self.create_time.strftime('%Y-%m-%d %H:%M:%S')
         }

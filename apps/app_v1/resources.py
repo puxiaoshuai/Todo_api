@@ -15,7 +15,7 @@ api = Api(app=app_v1)
 
 @app_v1.route("/uptoken/", methods=["POST"])
 def up_token():
-    access_key = "BkaslCENSa-EbKEjHbCExMprdB8FwTELgI_zOVZ5"
+    access_key = "BkaslCENSa-EbKEjHbCExMprdB8FwTELgI_zOVZ0"  #5
     secret_key = 'GQbM6Y9Orc09bW6CyRn8qaLVmqoTCYo84iex1zUk'
     q = qiniu.Auth(access_key, secret_key)
     bucket = 'todo'
@@ -99,11 +99,11 @@ class TaskAddView(Resource):
         parse.add_argument("files",action='append')
         title = parse.parse_args().get("title")
         content = parse.parse_args().get("content")
-        files = parse.parse_args().get("files", [])
+        files = parse.parse_args().get("files",None)
         print(files)
         user = g.user
         try:
-            task = TaskModel(title=title, content=content, images="" if files is [] else ",".join(files))
+            task = TaskModel(title=title, content=content, images=None if files is None else ",".join(files))
             task.user_id = user.id
 
             db.session.add(task)
