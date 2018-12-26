@@ -15,7 +15,7 @@ api = Api(app=app_v1)
 
 @app_v1.route("/uptoken/", methods=["POST"])
 def up_token():
-    access_key = "BkaslCENSa-EbKEjHbCExMprdB8FwTELgI_zOVZ0"  #5
+    access_key = "BkaslCENSa-EbKEjHbCExMprdB8FwTELgI_zOVZ5"  #5
     secret_key = 'GQbM6Y9Orc09bW6CyRn8qaLVmqoTCYo84iex1zUk'
     q = qiniu.Auth(access_key, secret_key)
     bucket = 'todo'
@@ -29,14 +29,15 @@ class TaskListView(Resource):
 
     # 如果前端要访问，需要传token，过来做比较,True做其他操作
     def post(self):
+        userid=session.get(config.USER_ID)
         parse = reqparse.RequestParser()
         parse.add_argument("page_size", type=str, default=config.PAGE_SIZE)
         parse.add_argument("page", required=True, type=str, help="page没有传递")
         page_size = parse.parse_args().get("page_size")
         page_index = parse.parse_args().get("page")
-        total_num = len(TaskModel.query.order_by(TaskModel.create_time.desc()).all())
+        total_num = len(TaskModel.query.filter_by(user_id=userid).order_by(TaskModel.create_time.desc()).all())
 
-        tasks = TaskModel.query.order_by(TaskModel.create_time.desc()).limit(page_size).offset(
+        tasks = TaskModel.query.filter_by(user_id=userid).order_by(TaskModel.create_time.desc()).limit(page_size).offset(
             (int(page_index) - 1) * int(page_size))
         task_list = [task.to_json() for task in tasks]
         to_data = {
@@ -73,8 +74,9 @@ class TaskEditView(Resource):
         parse.add_argument("id", required=True)
         parse.add_argument("title", required=True)
         parse.add_argument("content", required=True)
+        parse.add_argument("files", action='append')
         id = parse.parse_args().get('id', "0")
-
+        files = parse.parse_args().get("files", None)
         title = parse.parse_args().get('title')
         print(title)
         content = parse.parse_args().get('content')
@@ -82,7 +84,7 @@ class TaskEditView(Resource):
         if task:
             task.title = title
             task.content = content
-
+            task.images=None if files is None else ",".join(files)
             db.session.commit()
             return generate_response(message="编辑信息成功")
         else:
@@ -105,7 +107,6 @@ class TaskAddView(Resource):
         try:
             task = TaskModel(title=title, content=content, images=None if files is None else ",".join(files))
             task.user_id = user.id
-
             db.session.add(task)
             db.session.commit()
             return generate_response()
@@ -137,8 +138,6 @@ class LoginView(Resource):
         if user:
             if user.check_pwd(pwd):
                 session[config.USER_ID] = user.id
-                print("session 存储成功")
-                print(session.get(config.USER_ID))
                 return generate_response(message="登录成功", data=user.to_json())
             else:
                 return generate_response(message="账号或者密码错误", code=ResponseCode.CODE_MESSAGE_ERROR)
